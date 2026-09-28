@@ -95,6 +95,8 @@ declare class PeripheralManager extends EventEmitter<PeripheralManagerEventMap> 
    * @param psm - The PSM of the channel to unpublish, as assigned when it was published.
    */
   unpublishChannel(psm: number): void
+  /** Remove every service this instance has published, without destroying it. */
+  removeAllServices(): void
   /** Destroy the instance and release all resources. */
   destroy(): void
 

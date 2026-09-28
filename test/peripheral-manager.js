@@ -51,6 +51,31 @@ test('addService registers and confirms service', { skip: isCI }, async (t) => {
   t.is(uuid, SERVICE_UUID)
 })
 
+test('removeAllServices keeps the manager usable', { skip: isCI }, async (t) => {
+  using manager = new PeripheralManager()
+  await waitForPoweredOn(manager)
+
+  const added = () =>
+    new Promise((resolve) => manager.once('serviceAdd', (uuid, error) => resolve([uuid, error])))
+
+  manager.addService(new Service(SERVICE_UUID))
+  t.absent((await added())[1])
+
+  manager.removeAllServices()
+
+  manager.addService(new Service(SERVICE_UUID))
+  const [uuid, error] = await added()
+  t.absent(error, 'the manager accepts a service after removing them all')
+  t.is(uuid, SERVICE_UUID)
+})
+
+test('removeAllServices without services does not throw', { skip: isCI }, async (t) => {
+  using manager = new PeripheralManager()
+  await waitForPoweredOn(manager)
+
+  t.execution(() => manager.removeAllServices())
+})
+
 test('addService works with dynamic characteristic', { skip: isCI }, async (t) => {
   using manager = new PeripheralManager()
   await waitForPoweredOn(manager)
